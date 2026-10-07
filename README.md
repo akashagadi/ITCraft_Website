@@ -35,14 +35,14 @@ No npm install, pip install, WordPress, API keys, ChatGPT account or proprietary
 | `dist/app.js` | Homepage interaction, product copy, scroll chapter changes |
 | `dist/network-game.js` | 20-second game, scores, red-threat slicing, touch and keyboard input |
 | `dist/scene3d.js` | Product emblems, procedural 3D geometry, materials and rotation |
-| `dist/brand3d.js` | Story and Partner 3D visuals and retained hero model code |
+| `dist/brand3d.js` | Retained brand 3D scene code; Story and Partners now use optimized hero images |
 | `dist/progressive3d.js` | Lazy initialization, mobile/data-saver opt-in and fallback logic |
 | `dist/page.js` | Inner-page navigation and 3D initialization |
 | `dist/navigation.js` | Navigation prefetch and page transition support |
 | `dist/assets/` | Optimized logos, images and SVG artwork |
 | `dist/fonts/` | Local fonts and font licenses |
 | `dist/vendor/` | Pinned Three.js 0.180.0 and helper modules, with MIT license |
-| `artwork/` | Available original artwork, including previous hero images |
+| `artwork/` | Available original artwork, including generated Story and Partners hero images and previous hero images |
 | `scripts/check-site.py` | Static link, anchor and asset checks |
 | `.github/workflows/check.yml` | GitHub push/PR checks and generated-page consistency check |
 

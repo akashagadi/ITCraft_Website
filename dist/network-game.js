@@ -50,7 +50,7 @@ if(root){
  function spawnPacket(){const lane=serial++%3,bad=Math.random()<.72,el=document.createElement('button');el.type='button';el.className='arc-packet '+(bad?'threat':'safe');el.textContent=(bad?threats:safe)[Math.floor(Math.random()*3)];el.setAttribute('aria-label',`${bad?'Block threat':'Safe traffic: let through'}, ${el.textContent}, lane ${lane+1}`);layer.append(el);const p={el,lane,bad,y:-48};packets.push(p);el.addEventListener('click',()=>hit(p));}
  function frame(now){raf=0;if(mode!=='playing')return;const dt=Math.min((now-last)/1000||0,.05);last=now;time=Math.max(0,time-dt);spawn-=dt;
   if(spawn<=0){spawnPacket();spawn=time>10?.76:.61;}
-  const speed=(reduced.matches?48:58)+(20-time)*1.6;
+  const speed=((reduced.matches?48:58)+(20-time)*1.6)*Math.max(.8,(height-74)/211);
   for(const p of [...packets]){p.y+=dt*speed;p.el.style.transform=`translate(${(p.lane+.5)*width/3}px,${p.y}px) translateX(-50%)`;
    if(p.y>height-74){if(p.bad){health=Math.max(0,health-20);combo=0;feedback('THREAT GOT THROUGH',true);}else score+=2;remove(p);}}
   if(now>feedbackUntil){$('.arcade-combo').textContent='';$('.arcade-flash').classList.remove('hit');}
@@ -63,7 +63,6 @@ if(root){
  function finish(){mode='over';cancelAnimationFrame(raf);clear();root.classList.add('arcade-over');pause.disabled=true;const title=health===0?'Network breached.':health>=80?'Defence held strong.':'You held the line.';const result=`${blocked} threats sliced · ${score} points · ${health}% integrity`;showOverlay(title,result,'Play again');$('.game-status').textContent=title+' '+result;$('.game-next').hidden=false;start.focus();}
  start.addEventListener('click',()=>mode==='paused'?resume():begin());pause.addEventListener('click',()=>mode==='playing'?setPaused():resume());
  function laneHit(lane){if(mode!=='playing')return;const candidates=packets.filter(p=>p.lane===lane&&p.y>=0).sort((a,b)=>b.y-a.y);if(candidates[0])hit(candidates[0]);}
- root.querySelectorAll('[data-lane]').forEach(b=>b.addEventListener('click',()=>laneHit(Number(b.dataset.lane))));
  root.addEventListener('keydown',e=>{if(e.repeat)return;if(['1','2','3'].includes(e.key)){e.preventDefault();laneHit(Number(e.key)-1);}if(e.key==='Escape')setPaused();});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)setPaused();});
  new IntersectionObserver(entries=>{if(!entries[0].isIntersecting)setPaused();},{threshold:.15}).observe(root);
