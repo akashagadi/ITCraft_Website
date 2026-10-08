@@ -53,7 +53,11 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     if args.command == "dev":
-        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT / "dist"))
+        class NoCache(http.server.SimpleHTTPRequestHandler):
+            def end_headers(self):
+                self.send_header("Cache-Control", "no-store")  # local dev: always serve the latest files
+                super().end_headers()
+        handler = functools.partial(NoCache, directory=str(ROOT / "dist"))
         with http.server.ThreadingHTTPServer(("127.0.0.1", args.port), handler) as server:
             print(f"ITCraft: http://127.0.0.1:{args.port} (Ctrl+C to stop)", flush=True)
             try:
