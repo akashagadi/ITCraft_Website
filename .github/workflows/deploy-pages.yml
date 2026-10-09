@@ -2,7 +2,7 @@ name: Deploy ITCraft ONE to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [topology-demo]
   workflow_dispatch:
 
 permissions:
