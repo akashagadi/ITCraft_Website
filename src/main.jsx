@@ -19,8 +19,31 @@ const PHASES = [
   {id: 'protect', label: 'Aegis One', action: 'Activate Aegis One', title: 'Monitor, manage, and respond.', copy: 'Connect the hardened network to SOC/NOC operations. Observe firewall events, triage incidents, and monitor service availability while Project One policies keep enforcing protection.', steps: ['Connecting security telemetry', 'Enabling NOC health monitoring', 'Connecting SOC incident workflows', 'Validating monitoring coverage'], result: 'Aegis One SOC/NOC online. Security monitoring, incident management, and service health telemetry connected.', requires: 'build'},
   {id: 'recover', label: 'Phoenix ODR', action: 'Run recovery drill', title: 'Prove that recovery works.', copy: 'Simulate a primary workload outage, isolate it, and bring a recovery workload online without removing your defenses.', steps: ['Simulating primary workload outage', 'Isolating the affected workload', 'Restoring the recovery workload', 'Recovery workload online'], result: 'Recovery drill complete. Recovery workload online; primary isolated.', requires: 'protect'},
 ];
-const LOGOS = {discover: '/logos/itcraft.png', assess: '/logos/prism.png', build: '/logos/projectone.jpeg', protect: '/logos/aegis.jpg', recover: '/logos/phoenix.png'};
+const assetUrl = file => `${import.meta.env.BASE_URL}logos/${file}`;
+const LOGOS = {discover: assetUrl('itcraft.png'), assess: assetUrl('prism.png'), build: assetUrl('projectone.jpeg'), protect: assetUrl('aegis.jpg'), recover: assetUrl('phoenix.png')};
 const EMPTY_DEFENSES = {assess: false, build: false, protect: false, recover: false};
+
+function SimulatedTelemetry({attack, stats, defenses, operation, scanCount}) {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setTick(value => value + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const packets = attack ? 184 + ((tick * 7) % 41) : 0;
+  const latency = defenses.protect ? 8 + (tick % 3) : 18 + (tick % 6);
+  const coverage = Math.round((scanCount / FINDINGS.length) * 100);
+  const state = operation ? `${operation.id.toUpperCase()} IN PROGRESS` : attack?.stage?.toUpperCase() || 'STANDING BY';
+  return <section className="telemetry-strip" aria-label="Simulated telemetry">
+    <div className="telemetry-title"><Activity size={13}/><b>SIMULATED TELEMETRY</b><span>DEMO DATA</span></div>
+    <div className="telemetry-grid">
+      <div><span>PACKETS / SEC</span><strong>{String(packets).padStart(3, '0')}</strong></div>
+      <div><span>LATENCY</span><strong>{latency}<small> ms</small></strong></div>
+      <div><span>ASSESSMENT</span><strong>{coverage}<small>%</small></strong></div>
+      <div><span>EVENTS</span><strong>{String(stats.attempts + stats.blocked + stats.breaches).padStart(2, '0')}</strong></div>
+    </div>
+    <p><span className="telemetry-live-dot"/>{state} · illustrative values only; no live traffic is inspected.</p>
+  </section>;
+}
 
 function Pulse({color = '#ff456a'}) {
   const ref = useRef();
@@ -225,6 +248,7 @@ function App() {
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState({attempts: 0, blocked: 0, breaches: 0});
   const [epoch, setEpoch] = useState(0);
+  const [compactViewport, setCompactViewport] = useState(false);
   const attackRef = useRef(null);
   const eventId = useRef(0);
   const operationLock = useRef(false);
@@ -332,15 +356,24 @@ function App() {
   };
   const status = !attackOn ? 'Threat stream stopped' : ({entry: 'Threat approaching the firewall', crossing: 'Bypass drill: threat crossing the firewall', bypassed: 'Threat bypassed perimeter defenses', lateral: 'Lateral movement after perimeter bypass', detected: 'PrismSuite detected the bypassed threat', breach: 'Simulated workload compromised', contained: 'Project One contained the bypassed threat', blocked: 'Threat blocked before crossing the firewall'}[attack?.stage] || 'Starting threat stream');
 
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 760px)');
+    const sync = () => setCompactViewport(query.matches);
+    sync();
+    query.addEventListener?.('change', sync);
+    return () => query.removeEventListener?.('change', sync);
+  }, []);
+
   return <main>
-    <header className="app-header"><img src="/logos/itcraft.png" alt="ITCraft"/><div className="brand"><b>ITCRAFT <span>ONE</span></b><small>LIVE INFRASTRUCTURE EXPERIENCE</small></div><div className="demo-badge"><span/>INTERACTIVE DEMO</div><button className="reset-button" onClick={reset}><RotateCcw size={14}/><span>Reset demo</span></button></header>
+    <header className="app-header"><img src={LOGOS.discover} alt="ITCraft"/><div className="brand"><b>ITCRAFT <span>ONE</span></b><small>LIVE INFRASTRUCTURE EXPERIENCE</small></div><div className="demo-badge"><span/>INTERACTIVE DEMO</div><button className="reset-button" onClick={reset}><RotateCcw size={14}/><span>Reset demo</span></button></header>
     <div className="workspace">
       <section className="topology-panel" aria-label="Live network topology">
         <div className="topology-heading"><div><span className="eyebrow">NETWORK OPERATIONS</span><h1>One network. Every layer, connected.</h1></div><div className="connection-status"><span/>{defenses.recover || operation?.id === 'recover' || attack?.stage === 'breach' ? 'PRIMARY WORKLOAD OFFLINE' : '9 ASSET GROUPS ONLINE'}</div></div>
-        <div className="canvas-area"><Canvas shadows dpr={[1, 1.65]} camera={{position: [-.25, .45, 19], fov: 43, far: 150}} gl={{antialias: true, powerPreference: 'high-performance'}}><Suspense fallback={null}><Scene {...{defenses, operation, attackRef, attackType, scanCount, upgradeStep}} attackStage={attack?.stage}/></Suspense></Canvas></div>
+        <div className="canvas-area"><Canvas shadows={!compactViewport} dpr={compactViewport ? [1, 1.15] : [1, 1.65]} camera={{position: [-.25, .45, 19], fov: 43, far: 150}} gl={{antialias: true, powerPreference: 'high-performance'}}><Suspense fallback={null}><Scene {...{defenses, operation, attackRef, attackType, scanCount, upgradeStep}} attackStage={attack?.stage}/></Suspense></Canvas></div>
         <div className="topology-legend"><span><i className="traffic"/>Normal traffic</span><span style={{color: threatStyle.color}}>{attackType === 'ransomware' ? <LockKeyhole size={12}/> : <Bug size={12}/>} {threatStyle.label}</span><span><i className="protected"/>Protected boundary</span><span className="legend-hint">Hover to inspect an asset</span></div>
         <div className={`threat-status ${attack?.tone || 'info'}`} role="status"><ShieldAlert size={18}/><div><b>{status}</b><span>{attackOn ? `Attempt ${String(wave).padStart(2, '0')} · ${attackType} · ${attackRoute}` : 'Start the stream to watch an attack travel through the topology.'}</span></div>{attackOn && <span className="signal-bars"><i/><i/><i/><i/></span>}</div>
-        <div className="network-metrics"><div><span>DEMO SECURITY POSTURE</span><strong>{score ?? '—'}<small>{score ? '/ 100' : 'Awaiting scan'}</small></strong></div><div><span>ATTEMPTS</span><strong>{String(stats.attempts).padStart(2, '0')}</strong></div><div><span>CONTAINED / BLOCKED</span><strong className="green">{String(stats.blocked).padStart(2, '0')}</strong></div><div><span>REACHED WORKLOAD</span><strong className={stats.breaches ? 'red' : ''}>{String(stats.breaches).padStart(2, '0')}</strong></div></div>
+        <div className="network-metrics"><div><span>DEMO SECURITY POSTURE</span><strong>{score ?? '-'}<small>{score ? '/ 100' : 'Awaiting scan'}</small></strong></div><div><span>ATTEMPTS</span><strong>{String(stats.attempts).padStart(2, '0')}</strong></div><div><span>CONTAINED / BLOCKED</span><strong className="green">{String(stats.blocked).padStart(2, '0')}</strong></div><div><span>REACHED WORKLOAD</span><strong className={stats.breaches ? 'red' : ''}>{String(stats.breaches).padStart(2, '0')}</strong></div></div>
+        <SimulatedTelemetry attack={attack} stats={stats} defenses={defenses} operation={operation} scanCount={scanCount}/>
         <section className="transformation-panel" aria-label="Infrastructure transformation"><div className="transformation-heading"><div><span className="eyebrow">{defenses.build ? 'TRANSFORMATION COMPLETE' : operation?.id === 'build' ? 'PROJECT ONE · UPGRADING' : defenses.assess ? 'PRISMSUITE · FINDINGS CONFIRMED' : 'THE STARTING POINT'}</span><h2>{defenses.build ? 'The same network. A stronger foundation.' : 'See exactly what changes.'}</h2></div><span>{scanCount} / {FINDINGS.length} findings scanned</span></div><div className="transformation-grid">{FINDINGS.map(item => {
           const state = findingState(item, defenses, operation?.id, progress);
           return <article key={item.id} className={`transformation-item ${state}`} data-finding={item.id} data-state={state}><div><b>{item.label}</b><span>{state === 'resolved' ? 'UPGRADED' : state === 'upgrading' ? 'IN PROGRESS' : state === 'finding' ? 'FINDING' : 'NOT SCANNED'}</span></div><p className="before-state">{item.before}</p><p className="finding-detail">{state === 'unassessed' ? 'PrismSuite will assess this component.' : item.issue}</p><div className="after-state"><ArrowRight size={13}/><span>{item.after}</span>{state === 'resolved' && <Check size={13}/>}</div></article>;
