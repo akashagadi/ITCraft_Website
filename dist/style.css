@@ -679,3 +679,56 @@
 .cyber-arcade .arcade-demo span:nth-child(2){color:#c9f6c1;border-color:#4ed8a1;background:#12402e}
 .cyber-arcade .arcade-lanes button{color:#b8c8bd;border-color:#b6f4a333}
 .cyber-arcade .game-next{color:#c8ffb4}
+
+/* ===== navbar: Tech stack dropdown ===== */
+.nav-dd{position:relative}
+.nav-dd-btn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.nav-dd-btn:hover,.nav-dd.open .nav-dd-btn{color:var(--lime)}
+.nav-dd-btn i{width:7px;height:7px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .25s}
+.nav-dd.open .nav-dd-btn i,.nav-dd:hover .nav-dd-btn i{transform:rotate(225deg) translateY(-1px)}
+.nav-menu{position:absolute;top:calc(100% + 20px);left:50%;translate:-50% 8px;min-width:290px;padding:10px;display:grid;gap:2px;background:#0d2118f2;backdrop-filter:blur(14px);border:1px solid #b6f4a336;border-radius:18px;box-shadow:0 24px 70px #000b;opacity:0;visibility:hidden;transition:opacity .22s,translate .22s,visibility .22s;z-index:20}
+.nav-menu:before{content:'';position:absolute;left:0;right:0;top:-22px;height:22px}
+.nav-dd:hover .nav-menu,.nav-dd:focus-within .nav-menu,.nav-dd.open .nav-menu{opacity:1;visibility:visible;translate:-50% 0}
+.nav-menu a{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:13px 16px;border-radius:12px;font-size:15px}
+.nav-menu a b{font-weight:700}
+.nav-menu a small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8fa096;transition:color .2s}
+.nav-menu a:hover{background:#b6f4a31a;color:var(--lime)}.nav-menu a:hover small{color:var(--lime)}
+@media(max-width:600px){
+ .nav-dd{width:100%}
+ .nav-dd-btn{width:100%;justify-content:space-between;font-size:16px}
+ .nav-menu{position:static;translate:none;min-width:0;opacity:1;visibility:visible;display:none;background:none;border:0;box-shadow:none;backdrop-filter:none;padding:8px 0 0 12px}
+ .nav-menu:before{display:none}
+ .nav-dd:hover .nav-menu,.nav-dd:focus-within .nav-menu{display:none;translate:none}
+ .nav-dd.open .nav-menu{display:grid;translate:none}
+}
+@media(prefers-reduced-motion:reduce){.nav-menu,.nav-dd-btn i{transition:none}}
+
+/* logo: no white plate; a soft glow keeps it readable on the dark header */
+.brand{background:none;border-radius:0;overflow:visible}
+.brand img{filter:brightness(1.35) saturate(1.15) drop-shadow(0 0 1.5px #ffffffcc) drop-shadow(0 0 10px #b6f4a366);transition:filter .3s}
+.brand:hover img{filter:brightness(1.45) saturate(1.2) drop-shadow(0 0 2px #fff) drop-shadow(0 0 16px #b6f4a3aa)}
+.brand img{transform:scale(1.4);filter:brightness(1.55) saturate(1.2) drop-shadow(0 0 2px #fffffff0) drop-shadow(0 0 10px #b6f4a380)}
+.brand:hover img{filter:brightness(1.7) saturate(1.25) drop-shadow(0 0 3px #fff) drop-shadow(0 0 18px #b6f4a3b0)}
+@media(max-width:600px){.brand img{transform:scale(1.25)}}
+/* logo: plain, no glow */
+.brand img,.brand:hover img{filter:brightness(1.2);transition:none}
+
+/* ===== PrismSuite hero: light-splitting prism ===== */
+body[data-product] .detail-visual{background:radial-gradient(ellipse at 42% 42%,#143a2c,#07150f 72%);border:1px solid #b6f4a330;color:#eaf7ee;box-shadow:0 30px 80px #0007}
+body[data-product] .detail-visual .product-art{height:560px;max-height:none;cursor:grab}
+body[data-product] .detail-visual .model-tools{bottom:auto;top:16px;left:auto;right:18px;color:#8fa096;z-index:4}
+body[data-product] .detail-visual .model-tools button{color:#b8c8bd}
+.prism-ui{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;border-radius:inherit}
+.prism-ui:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 46% 46%,transparent 45%,#04100bcc 100%);pointer-events:none}
+.prism-badge{position:absolute;left:18px;top:16px;height:44px;width:auto;background:#fff;border-radius:11px;padding:4px 10px;object-fit:contain;z-index:2}
+.prism-label{position:absolute;left:0;top:0;pointer-events:auto;display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 10px;border-radius:999px;background:#06130fcc;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);color:#eaf7ee;font:700 13px 'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:background .25s,border-color .25s,opacity .3s,box-shadow .3s;will-change:transform;z-index:2}
+.prism-label i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c);flex:none}
+.prism-label.on{background:color-mix(in srgb,var(--c) 24%,#06130f);border-color:var(--c);box-shadow:0 0 24px color-mix(in srgb,var(--c) 45%,transparent)}
+.prism-label.dim{opacity:.38}
+.prism-label:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.prism-caption{position:absolute;left:18px;right:18px;bottom:16px;padding:13px 18px;border-radius:16px;background:#06130fd9;border:1px solid #b6f4a330;backdrop-filter:blur(8px);font-size:14px;line-height:1.4;color:#c3d3c8;min-height:68px;pointer-events:none;z-index:2}
+.prism-caption b{display:block;font:800 17px Manrope,sans-serif;color:var(--c,#fff);margin-bottom:2px}
+.prism-narrow .prism-label{font-size:11.5px;padding:5px 10px 5px 8px;gap:7px}.prism-narrow .prism-caption{font-size:13px;padding:11px 14px;min-height:60px}.prism-narrow .prism-badge{height:36px}
+@media(max-width:900px){body[data-product] .detail-visual .product-art{height:480px}}
+
+.prism-narrow .prism-label:not(.on){padding:6px;gap:0}.prism-narrow .prism-label:not(.on) span{display:none}

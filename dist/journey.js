@@ -285,7 +285,7 @@ function frame(now){
 }
 function kick(){if(!rafId)rafId=requestAnimationFrame(frame);}
 function sizeTrack(){// the scroll distance follows the path length, so there is time to read every station
- root.style.height=Math.round(S.L*(S.mobile?1:1.15)+innerHeight)+'px';
+ root.style.height=Math.round(S.L*(S.mobile?1.2:1.4)+innerHeight)+'px';
 }
 function measure(){topY=root.getBoundingClientRect().top+scrollY;heightPx=root.offsetHeight;boardW=board.clientWidth;boardH=board.clientHeight;}
 function init(){
